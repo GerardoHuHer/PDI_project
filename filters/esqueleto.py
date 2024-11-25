@@ -1,22 +1,28 @@
 import cv2
 import numpy as np
 
-path: str = "D:\\Procesamiento_Imagenes_UP\\TareaMascaras\\arbol.jpg"
-img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
-el_estruc = cv2.getStructuringElement(cv2.MORPH_CROSS, (15, 15))
-esqueleto = np.zeros(img.shape, np.uint8)
-img_temp = img.copy()
+def skeletonize(frame):
+    """
+    Skeletonize the objects in the frame.
+    Args:
+        frame (numpy.ndarray): The input video frame.
+    Returns:
+        numpy.ndarray: Skeletonized frame.
+    """
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    skeleton = np.zeros_like(binary)
+    element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
 
-while True:
-    apertura = cv2.morphologyEx(img_temp, cv2.MORPH_OPEN, el_estruc)
-    temp = cv2.subtract(img_temp, apertura)
-    eroded = cv2.erode(img_temp, el_estruc)
-    esqueleto = cv2.bitwise_or(esqueleto, temp)
-    img_temp = eroded.copy()
-    if cv2.countNonZero(img_temp) == 0:
-        break
+    while True:
+        eroded = cv2.erode(binary, element)
+        temp = cv2.dilate(eroded, element)
+        temp = cv2.subtract(binary, temp)
+        skeleton = cv2.bitwise_or(skeleton, temp)
+        binary = eroded.copy()
 
-cv2.imshow("Esqueleto", esqueleto)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+        if cv2.countNonZero(binary) == 0:
+            break
+
+    return cv2.cvtColor(skeleton, cv2.COLOR_GRAY2BGR)

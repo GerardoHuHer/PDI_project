@@ -1,22 +1,17 @@
-
 import cv2
 import numpy as np
 
-path: str = "D:\\Procesamiento_Imagenes_UP\\TareaMascaras\\arbol.jpg"
-# Cargar la imagen binaria
-imagen = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
-# Definir el elemento estructurante
-elemento_estructurante = np.ones((17, 17), np.uint8)
-
-# Aplicar el cierre
-imagen_cierre = cv2.morphologyEx(imagen, cv2.MORPH_CLOSE, elemento_estructurante)
-
-# Calcular la operación Black-Hat
-black_hat = cv2.subtract(imagen_cierre, imagen)
-
-# Mostrar el resultado de la operación Black-Hat
-cv2.imshow('Imagen Original', imagen)
-cv2.imshow('Black-Hat', black_hat)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+def blackhat(frame, kernel_size=15):
+    """
+    Apply Blackhat morphological operation to highlight dark regions.
+    Args:
+        frame (numpy.ndarray): The input video frame.
+        kernel_size (int): Size of the structuring element.
+    Returns:
+        numpy.ndarray: Frame with dark regions highlighted.
+    """
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
+    blackhat_result = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, kernel)
+    return cv2.cvtColor(blackhat_result, cv2.COLOR_GRAY2BGR)

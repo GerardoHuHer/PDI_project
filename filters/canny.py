@@ -1,22 +1,16 @@
 import cv2
-import numpy as np
-import matplotlib.pyplot as plt
 
-path: str = "D:\\Procesamiento_Imagenes_UP\\binaria.png"
-imagen = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
-bordes = cv2.Canny(imagen, 100, 130)
-
-plt.figure(figsize=(10, 5))
-
-plt.subplot(1, 2, 1)
-plt.imshow(imagen, cmap='gray')
-plt.title('Imagen Original')
-plt.axis('off')
-
-plt.subplot(1, 2, 2)
-plt.imshow(bordes, cmap='gray')
-plt.title('Filtro de Canny')
-plt.axis('off')
-
-plt.show()
+def canny(frame, threshold1=100, threshold2=200):
+    """
+    Apply Canny edge detection to the frame.
+    Args:
+        frame (numpy.ndarray): The input video frame.
+        threshold1 (int): First threshold for hysteresis.
+        threshold2 (int): Second threshold for hysteresis.
+    Returns:
+        numpy.ndarray: Frame with edges highlighted.
+    """
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+    edges = cv2.Canny(gray, threshold1, threshold2)
+    return cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)  # Convert back to BGR for compatibility
