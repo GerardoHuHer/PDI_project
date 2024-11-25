@@ -1,23 +1,25 @@
-import cv2
 import numpy as np
 
 
 def ajustar_brillo(frame, factor=1.0):
     """
-    Adjusts the brightness of a video frame in real-time.
+    Adjusts the brightness of a video frame or image.
     Args:
-        frame (numpy.ndarray): The input video frame.
-        factor (float): Brightness adjustment factor (>1 increases brightness, <1 decreases it).
+        frame (numpy.ndarray): The input frame (BGR format).
+        factor (float): Brightness adjustment factor (>1 increases brightness, <1 decreases brightness).
     Returns:
         numpy.ndarray: Frame with adjusted brightness.
     """
-    # Convert the frame to float32 to prevent overflow during scaling
-    frame = frame.astype(np.float32)
+    if not isinstance(frame, np.ndarray):
+        raise ValueError("Input frame must be a numpy.ndarray")
 
-    # Scale each channel by the brightness factor
-    frame = frame * factor
+    # Convert frame to float32 to avoid overflow/underflow
+    frame_float = frame.astype(np.float32)
 
-    # Clip the values to the valid range [0, 255] and convert back to uint8
-    frame = np.clip(frame, 0, 255).astype(np.uint8)
+    # Scale brightness
+    frame_bright = frame_float * factor
 
-    return frame
+    # Clip values to valid range [0, 255] and convert back to uint8
+    frame_bright = np.clip(frame_bright, 0, 255).astype(np.uint8)
+
+    return frame_bright
