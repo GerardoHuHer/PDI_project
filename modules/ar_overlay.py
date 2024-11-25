@@ -1,21 +1,15 @@
-import cv2
-
-
-def overlay_image(frame, overlay, x, y, w, h):
+def overlay_multiple_objects(frame, objects, overlay, scale_factor=1.0):
     """
-    Overlay an image on the frame at the specified position.
+    Overlay an image on multiple detected objects.
     Args:
         frame (numpy.ndarray): The input frame.
+        objects (list): List of bounding boxes [(x, y, w, h)].
         overlay (numpy.ndarray): The overlay image (with alpha channel).
-        x, y, w, h: Position and size of the overlay.
+        scale_factor (float): Scaling factor for overlay size.
+    Returns:
+        numpy.ndarray: Frame with overlays applied.
     """
-    overlay_resized = cv2.resize(overlay, (w, h))
-    alpha_overlay = overlay_resized[:, :, 3] / 255.0  # Extract alpha channel
-    alpha_background = 1.0 - alpha_overlay
-
-    for c in range(0, 3):  # Loop over color channels
-        frame[y:y + h, x:x + w, c] = (
-                alpha_overlay * overlay_resized[:, :, c] +
-                alpha_background * frame[y:y + h, x:x + w, c]
-        )
+    for (x, y, w, h) in objects:
+        resized_overlay = cv2.resize(overlay, (int(w * scale_factor), int(h * scale_factor)))
+        frame = overlay_image(frame, resized_overlay, x, y, w, h)
     return frame
